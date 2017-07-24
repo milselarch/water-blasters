@@ -5,8 +5,8 @@ package com.milselarch;
  */
 
 public interface Commons {
-    public static final int BOARD_WIDTH = 358*2;
-    public static final int BOARD_HEIGHT = 350*2;
+    public static final int BOARD_WIDTH = 720;
+    public static final int BOARD_HEIGHT = 480;
     public static final int GROUND = 290;
     public static final int BOMB_HEIGHT = 5;
     public static final int ALIEN_HEIGHT = 12;
@@ -19,4 +19,6 @@ public interface Commons {
     public static final int DELAY = 17;
     public static final int PLAYER_WIDTH = 15;
     public static final int PLAYER_HEIGHT = 10;
+
+    public static final int BORDER = 2;
 }

@@ -48,7 +48,7 @@ public class Board extends JPanel implements Runnable, Commons {
         addKeyListener(new TAdapter());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
-        setBackground(Color.black);
+        setBackground(Color.white);
 
         gameInit();
         setDoubleBuffered(true);
@@ -130,7 +130,7 @@ public class Board extends JPanel implements Runnable, Commons {
         g.setColor(Color.green);
 
         if (ingame) {
-            g.drawLine(0, GROUND, BOARD_WIDTH, GROUND);
+            //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
             //drawAliens(g);
             drawPlayer(g);
             drawShot(g);
