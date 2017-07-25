@@ -17,11 +17,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public class Board extends JPanel implements Runnable, Commons {
-
     private Dimension d;
     private ArrayList<Alien> aliens;
     private Player player;
@@ -39,12 +37,10 @@ public class Board extends JPanel implements Runnable, Commons {
     private Thread animator;
 
     public Board() {
-
         initBoard();
     }
 
     private void initBoard() {
-
         addKeyListener(new TAdapter());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
@@ -56,7 +52,6 @@ public class Board extends JPanel implements Runnable, Commons {
 
     @Override
     public void addNotify() {
-
         super.addNotify();
         gameInit();
     }
@@ -72,39 +67,31 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawAliens(Graphics g) {
-
         Iterator it = aliens.iterator();
 
         for (Alien alien: aliens) {
-
             if (alien.isVisible()) {
-
                 g.drawImage(alien.getImage(), alien.getX(), alien.getY(), this);
             }
 
             if (alien.isDying()) {
-
                 alien.die();
             }
         }
     }
 
     public void drawPlayer(Graphics g) {
-
         if (player.isVisible()) {
-
             g.drawImage(player.getImage(), player.getX(), player.getY(), this);
         }
 
         if (player.isDying()) {
-
             player.die();
             ingame = false;
         }
     }
 
     public void drawShot(Graphics g) {
-
         if (shot.isVisible()) {
 
             g.drawImage(shot.getImage(), shot.getX(), shot.getY(), this);
@@ -142,7 +129,6 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void gameOver() {
-
         Graphics g = this.getGraphics();
 
         g.setColor(Color.black);
@@ -163,9 +149,7 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void animationCycle() {
-
         if (deaths == NUMBER_OF_ALIENS_TO_DESTROY) {
-
             ingame = false;
             message = "Game won!";
         }
@@ -176,13 +160,10 @@ public class Board extends JPanel implements Runnable, Commons {
 
     @Override
     public void run() {
-
         long beforeTime, timeDiff, sleep;
-
         beforeTime = System.currentTimeMillis();
 
         while (ingame) {
-
             repaint();
             animationCycle();
 
@@ -206,7 +187,6 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     private class TAdapter extends KeyAdapter {
-
         @Override
         public void keyReleased(KeyEvent e) {
 
@@ -215,7 +195,6 @@ public class Board extends JPanel implements Runnable, Commons {
 
         @Override
         public void keyPressed(KeyEvent e) {
-
             player.keyPressed(e);
 
             int x = player.getX();

@@ -5,7 +5,6 @@ package com.milselarch;
  */
 
 import java.awt.event.KeyEvent;
-
 import javax.swing.ImageIcon;
 
 public class Player extends Sprite implements Commons {
