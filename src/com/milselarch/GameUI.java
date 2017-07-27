@@ -1,18 +1,20 @@
 package com.milselarch;
 
-import java.awt.BorderLayout;
-import java.awt.Insets;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class GameUI extends JFrame {
+public class GameUI extends JFrame implements Commons {
+    private static Board board;
+
     public GameUI() {
         initUI();
     }
 
     private void initUI() {
-
         JMenuBar menubar = new JMenuBar();
         JMenu file = new JMenu("File");
 
@@ -50,21 +52,53 @@ public class GameUI extends JFrame {
         //vertical.add(printBtn);
         //add(vertical, BorderLayout.WEST);
 
-        JScrollPane scrollxy = new JScrollPane();
+        JScrollPane scrollxy = new JScrollPane(
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        );
+
+        this.insertGame(scrollxy);
+
+        //configure scrollxy JScrollPane
+        scrollxy.setSize(new Dimension(400, 400));
+        scrollxy.getViewport().setBackground(Color.GREEN);
         add(scrollxy, BorderLayout.CENTER);
 
+        //make statusbar
         JLabel statusbar = new JLabel(" Statusbar");
         add(statusbar, BorderLayout.SOUTH);
 
-        setSize(400, 350);
-        setTitle("BorderLayout");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        //configure JFrame
+        this.setSize(700, 500);
+        this.setTitle("BorderLayout");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+
+        this.setVisible(true);
+        this.setResizable(false);
+    }
+
+    private void insertGame(JScrollPane scrollxy) {
+        scrollxy.setVisible(true);
+        this.board = new Board();
+        this.board.setVisible(true);
+        scrollxy.add(this.board);
+        this.board.gameInit();
+        this.board.setVisible(true);
+        this.board.setSize(BOARD_WIDTH, BOARD_HEIGHT);
+
+        this.addKeyListener(this.board.eventListener);
     }
 
     public static void main(String[] args) {
-
+        /*
         SwingUtilities.invokeLater(() -> {
+            GameUI ex = new GameUI();
+            ex.setVisible(true);
+        });
+        */
+
+        EventQueue.invokeLater(() -> {
             GameUI ex = new GameUI();
             ex.setVisible(true);
         });

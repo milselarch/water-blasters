@@ -25,6 +25,8 @@ public class Board extends JPanel implements Runnable, Commons {
     private Player player;
     private Shot shot;
 
+    TAdapter eventListener;
+
     private final int ALIEN_INIT_X = 150;
     private final int ALIEN_INIT_Y = 5;
     private int direction = -1;
@@ -36,12 +38,19 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private Thread animator;
 
-    public Board() {
+    Board() {
         initBoard();
     }
 
+    Board(boolean start) {
+        if (start) {
+            initBoard();
+        }
+    }
+
     private void initBoard() {
-        addKeyListener(new TAdapter());
+        this.eventListener = new TAdapter();
+        //addKeyListener(new TAdapter());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
         setBackground(Color.white);
@@ -93,7 +102,6 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void drawShot(Graphics g) {
         if (shot.isVisible()) {
-
             g.drawImage(shot.getImage(), shot.getX(), shot.getY(), this);
         }
     }
@@ -164,7 +172,9 @@ public class Board extends JPanel implements Runnable, Commons {
         beforeTime = System.currentTimeMillis();
 
         while (ingame) {
-            repaint();
+            //System.out.println("POTATOXXX");
+
+            this.repaint();
             animationCycle();
 
             timeDiff = System.currentTimeMillis() - beforeTime;
@@ -186,15 +196,17 @@ public class Board extends JPanel implements Runnable, Commons {
         gameOver();
     }
 
-    private class TAdapter extends KeyAdapter {
+    public class TAdapter extends KeyAdapter {
         @Override
         public void keyReleased(KeyEvent e) {
-
             player.keyReleased(e);
+            System.out.println(e);
         }
 
         @Override
         public void keyPressed(KeyEvent e) {
+            System.out.println(e);
+
             player.keyPressed(e);
 
             int x = player.getX();
@@ -203,7 +215,6 @@ public class Board extends JPanel implements Runnable, Commons {
             int key = e.getKeyCode();
 
             if (key == KeyEvent.VK_SPACE) {
-
                 if (ingame) {
                     if (!shot.isVisible()) {
                         shot = new Shot(x, y);
