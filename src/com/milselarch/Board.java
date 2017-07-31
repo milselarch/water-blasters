@@ -25,7 +25,7 @@ public class Board extends JPanel implements Runnable, Commons {
     public Player player;
     private Shot shot;
 
-    private JFrame frame;
+    private GameUI frame;
 
     //TAdapter eventListener;
 
@@ -40,11 +40,11 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private Thread animator;
 
-    Board(JFrame frame) {
+    Board(GameUI frame) {
         this.frame = frame;
     }
 
-    Board(boolean start, JFrame frame) {
+    Board(boolean start, GameUI frame) {
         this.frame = frame;
 
         if (start) {
@@ -56,6 +56,8 @@ public class Board extends JPanel implements Runnable, Commons {
         //this.eventListener = new TAdapter();
         //addKeyListener(new TAdapter());
         setFocusable(true);
+        this.frame.setVisible(true);
+
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
         setBackground(Color.white);
 
@@ -105,7 +107,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void drawPlayer(Graphics g) {
         if (player.isVisible()) {
-            g.drawImage(player.getImage(), player.getX(), player.getY(), this);
+            g.drawImage(player.getImage(), d.width/2, d.height/2, this);
         }
 
         if (player.isDying()) {
@@ -131,13 +133,19 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     @Override
+    public void setSize(Dimension d) {
+        super.setSize(d);
+        this.d = d;
+    }
+
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         g.setColor(Color.black);
-        System.out.println(this);
+        //System.out.println(this.d);
         g.fillRect(0, 0, d.width, d.height);
-        g.setColor(Color.green);
+        //g.setColor(Color.green);
 
         if (ingame) {
             //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
@@ -167,8 +175,10 @@ public class Board extends JPanel implements Runnable, Commons {
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(message, (BOARD_WIDTH - metr.stringWidth(message)) / 2,
-                BOARD_WIDTH / 2);
+        g.drawString(
+            message, (BOARD_WIDTH - metr.stringWidth(message)) / 2,
+            BOARD_WIDTH / 2
+        );
     }
 
     public void animationCycle() {
@@ -205,7 +215,6 @@ public class Board extends JPanel implements Runnable, Commons {
             System.out.println(key);
 
             if (key == KeyEvent.VK_SPACE) {
-
                 if (ingame) {
                     if (!shot.isVisible()) {
                         shot = new Shot(x, y);

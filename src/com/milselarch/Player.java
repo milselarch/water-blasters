@@ -75,7 +75,6 @@ public class Player extends Sprite implements Commons {
     }
 
     public void keyReleased(KeyEvent e) {
-
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {

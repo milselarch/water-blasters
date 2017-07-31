@@ -1,13 +1,12 @@
 package com.milselarch;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.*;
 
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import static javax.swing.BorderFactory.createEmptyBorder;
 
 public class GameUI extends JFrame implements Commons {
     private static Board board;
@@ -54,41 +53,38 @@ public class GameUI extends JFrame implements Commons {
         //vertical.add(printBtn);
         //add(vertical, BorderLayout.WEST);
 
-        JScrollPane scrollxy = new JScrollPane(
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
-        );
-
-        this.insertGame(scrollxy);
-
-        //configure scrollxy JScrollPane
-        scrollxy.setSize(new Dimension(400, 400));
-        scrollxy.getViewport().setBackground(Color.GREEN);
-        add(scrollxy, BorderLayout.CENTER);
-
         //make statusbar
         JLabel statusbar = new JLabel(" Statusbar");
         add(statusbar, BorderLayout.SOUTH);
 
+        this.insertGame();
+
         //configure JFrame
-        this.setSize(700, 500);
+        this.setSize(BOARD_WIDTH, BOARD_HEIGHT);
         this.setTitle("BorderLayout");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
 
         this.setVisible(true);
         this.setResizable(false);
+
+        //this.board.setSize(this.board.getSize());
+        //System.out.println(this.getScrollxy().getSize());
+        this.board.gameInit();
+        this.board.setSize(this.board.getSize());
     }
 
-    private void insertGame(JScrollPane scrollxy) {
-        scrollxy.setVisible(true);
-        this.board = new Board(true,this);
-        this.board.gameInit();
+    private void insertGame() {
+        //scrollxy.setViewportBorder(null);
 
+        this.board = new Board(true,this);
+        //this.board.gameInit();
+
+        //this.board.setVisible(true);
+        add(this.board, BorderLayout.CENTER);
         this.board.setVisible(true);
-        scrollxy.add(this.board);
-        this.board.setVisible(true);
-        this.board.setSize(BOARD_WIDTH, BOARD_HEIGHT);
+        //this.board.setSize(BOARD_WIDTH, BOARD_HEIGHT);
+        //this.board.setSize(scrollxy.getSize());
     }
 
     public static void main(String[] args) {
