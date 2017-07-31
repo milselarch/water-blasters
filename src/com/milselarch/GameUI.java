@@ -3,6 +3,8 @@ package com.milselarch;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.*;
+
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -80,14 +82,13 @@ public class GameUI extends JFrame implements Commons {
 
     private void insertGame(JScrollPane scrollxy) {
         scrollxy.setVisible(true);
-        this.board = new Board();
+        this.board = new Board(true,this);
+        this.board.gameInit();
+
         this.board.setVisible(true);
         scrollxy.add(this.board);
-        this.board.gameInit();
         this.board.setVisible(true);
         this.board.setSize(BOARD_WIDTH, BOARD_HEIGHT);
-
-        this.addKeyListener(this.board.eventListener);
     }
 
     public static void main(String[] args) {

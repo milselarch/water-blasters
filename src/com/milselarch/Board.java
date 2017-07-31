@@ -22,10 +22,12 @@ import javax.swing.*;
 public class Board extends JPanel implements Runnable, Commons {
     private Dimension d;
     private ArrayList<Alien> aliens;
-    private Player player;
+    public Player player;
     private Shot shot;
 
-    TAdapter eventListener;
+    private JFrame frame;
+
+    //TAdapter eventListener;
 
     private final int ALIEN_INIT_X = 150;
     private final int ALIEN_INIT_Y = 5;
@@ -38,25 +40,37 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private Thread animator;
 
-    Board() {
-        initBoard();
+    Board(JFrame frame) {
+        this.frame = frame;
     }
 
-    Board(boolean start) {
+    Board(boolean start, JFrame frame) {
+        this.frame = frame;
+
         if (start) {
             initBoard();
         }
     }
 
     private void initBoard() {
-        this.eventListener = new TAdapter();
+        //this.eventListener = new TAdapter();
         //addKeyListener(new TAdapter());
         setFocusable(true);
         d = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
         setBackground(Color.white);
 
         gameInit();
+        this.setEventListener();
         setDoubleBuffered(true);
+    }
+
+    public boolean isIngame() {
+        return this.ingame;
+    }
+
+    public Player getPlayer() {
+        //System.out.println(this.player);
+        return this.player;
     }
 
     @Override
@@ -66,7 +80,7 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void gameInit() {
-        player = new Player();
+        this.player = new Player();
         shot = new Shot();
 
         if (animator == null || !ingame) {
@@ -121,6 +135,7 @@ public class Board extends JPanel implements Runnable, Commons {
         super.paintComponent(g);
 
         g.setColor(Color.black);
+        System.out.println(this);
         g.fillRect(0, 0, d.width, d.height);
         g.setColor(Color.green);
 
@@ -166,6 +181,40 @@ public class Board extends JPanel implements Runnable, Commons {
         player.act();
     }
 
+    private void setEventListener() {
+        this.frame.setFocusable(true);
+        TAdapter adapter = new TAdapter();
+        //adapter.setBoard(this.board);
+        this.frame.addKeyListener(adapter);
+    }
+
+    private class TAdapter extends KeyAdapter {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            player.keyReleased(e);
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            player.keyPressed(e);
+
+            int x = player.getX();
+            int y = player.getY();
+
+            int key = e.getKeyCode();
+            System.out.println(key);
+
+            if (key == KeyEvent.VK_SPACE) {
+
+                if (ingame) {
+                    if (!shot.isVisible()) {
+                        shot = new Shot(x, y);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void run() {
         long beforeTime, timeDiff, sleep;
@@ -194,33 +243,5 @@ public class Board extends JPanel implements Runnable, Commons {
         }
 
         gameOver();
-    }
-
-    public class TAdapter extends KeyAdapter {
-        @Override
-        public void keyReleased(KeyEvent e) {
-            player.keyReleased(e);
-            System.out.println(e);
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            System.out.println(e);
-
-            player.keyPressed(e);
-
-            int x = player.getX();
-            int y = player.getY();
-
-            int key = e.getKeyCode();
-
-            if (key == KeyEvent.VK_SPACE) {
-                if (ingame) {
-                    if (!shot.isVisible()) {
-                        shot = new Shot(x, y);
-                    }
-                }
-            }
-        }
     }
 }
