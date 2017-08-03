@@ -6,8 +6,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import static javax.swing.BorderFactory.createEmptyBorder;
-
 public class GameUI extends JFrame implements Commons {
     private static Board board;
 
@@ -70,8 +68,14 @@ public class GameUI extends JFrame implements Commons {
 
         //this.board.setSize(this.board.getSize());
         //System.out.println(this.getScrollxy().getSize());
+        this.board.setSize(
+            new Dimension(
+                this.getWidth(),
+                this.board.getSize().height
+            )
+        );
+
         this.board.gameInit();
-        this.board.setSize(this.board.getSize());
     }
 
     private void insertGame() {

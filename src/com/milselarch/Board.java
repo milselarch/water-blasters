@@ -15,13 +15,15 @@ import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
 
 import javax.swing.*;
 
 public class Board extends JPanel implements Runnable, Commons {
+    public int worldx = 0;
+    public int worldy = 0;
+
     private Dimension d;
-    private ArrayList<Alien> aliens;
+    private ArrayList<Monster> monsters;
     public Player player;
     private Shot shot;
 
@@ -82,7 +84,23 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void gameInit() {
-        this.player = new Player();
+        this.monsters = new ArrayList<>();
+        RandomRange random = new RandomRange();
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                Monster monster = new Monster(
+                    this,
+                    random.rand(0, BOARD_WIDTH),
+                    random.rand(0, BOARD_HEIGHT)
+                );
+
+                monsters.add(monster);
+            }
+        }
+
+
+        this.player = new Player(this);
         shot = new Shot();
 
         if (animator == null || !ingame) {
@@ -92,15 +110,20 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawAliens(Graphics g) {
-        Iterator it = aliens.iterator();
+        Iterator it = monsters.iterator();
 
-        for (Alien alien: aliens) {
-            if (alien.isVisible()) {
-                g.drawImage(alien.getImage(), alien.getX(), alien.getY(), this);
+        for (Monster monster : monsters) {
+            if (monster.isVisible()) {
+                g.drawImage(
+                    monster.getImage(),
+                    monster.getX() + this.worldx,
+                    monster.getY() + this.worldy,
+                    this
+                );
             }
 
-            if (alien.isDying()) {
-                alien.die();
+            if (monster.isDying()) {
+                monster.die();
             }
         }
     }
@@ -123,8 +146,8 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawBombing(Graphics g) {
-        for (Alien a : aliens) {
-            Alien.Bomb b = a.getBomb();
+        for (Monster a : monsters) {
+            Monster.Bomb b = a.getBomb();
 
             if (!b.isDestroyed()) {
                 g.drawImage(b.getImage(), b.getX(), b.getY(), this);
@@ -148,8 +171,10 @@ public class Board extends JPanel implements Runnable, Commons {
         //g.setColor(Color.green);
 
         if (ingame) {
+            //System.out.println("WORLDX: " + this.worldx);
+
             //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
-            //drawAliens(g);
+            drawAliens(g);
             drawPlayer(g);
             drawShot(g);
             //drawBombing(g);

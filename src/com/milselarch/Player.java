@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
 public class Player extends Sprite implements Commons {
+    private Board board;
 
     private final int START_Y = 580;
     private final int START_X = 470;
@@ -16,12 +17,12 @@ public class Player extends Sprite implements Commons {
     private int width;
     private int height;
 
-    public Player() {
-
-        initPlayer();
+    public Player(Board board) {
+        initPlayer(board);
     }
 
-    private void initPlayer() {
+    private void initPlayer(Board board) {
+        this.board = board;
 
         ImageIcon ii = new ImageIcon(playerImg);
 
@@ -38,8 +39,8 @@ public class Player extends Sprite implements Commons {
         x,y coordinates are actually the top left corner of the sprite
         */
         //System.out.println(Integer.toString(x) + ", " +Integer.toString(y) + ", " +Integer.toString(height + y));
-        x += dx;
-        y += dy;
+        this.board.worldx += dx;
+        this.board.worldy += dy;
 
         if (x <= BORDER) {
             x = BORDER;
