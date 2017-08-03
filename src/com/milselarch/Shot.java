@@ -51,4 +51,14 @@ public class Shot extends Sprite {
 
         return false;
     }
+
+    public Monster getHitMonster() {
+        for (Monster monster : this.board.monsters) {
+            if (Sprite.isColliding(this, monster)) {
+                return monster;
+            }
+        }
+
+        return null;
+    }
 }

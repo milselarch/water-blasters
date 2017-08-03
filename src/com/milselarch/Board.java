@@ -17,8 +17,8 @@ public class Board extends JPanel implements Runnable, Commons {
     public int worldy = 0;
 
     private Dimension d;
-    private ArrayList<Monster> monsters;
-    private ArrayList<Shot> shots;
+    ArrayList<Monster> monsters;
+    ArrayList<Shot> shots;
     public Player player;
 
     private GameUI frame;
@@ -82,7 +82,7 @@ public class Board extends JPanel implements Runnable, Commons {
         this.shots = new ArrayList<>();
         RandomRange random = new RandomRange();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 200; i++) {
             Monster monster = new Monster(
                 this,
                 random.rand(0, WORLD_WIDTH),
@@ -102,13 +102,31 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawAliens(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
         Iterator it = monsters.iterator();
 
         for (Monster monster : monsters) {
             monster.act();
 
+            //System.out.println(player.getX());
+
+            Vector distance = new Vector(
+                player.getX() - monster.getX(),
+                player.getY() - monster.getY()
+            );
+
+            monster.charge(distance);
+
             if (monster.isVisible()) {
-                g.drawImage(
+                float opacity;
+                if (monster.stunned()) { opacity = 0.5f; }
+                else { opacity = 1; }
+
+                g2d.setComposite(
+                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity)
+                );
+
+                g2d.drawImage(
                     monster.getImage(),
                     monster.getX() - this.worldx,
                     monster.getY() - this.worldy,
@@ -143,8 +161,17 @@ public class Board extends JPanel implements Runnable, Commons {
             Shot shot = shots.get(index);
             shot.act();
 
+            Monster hitMonster = shot.getHitMonster();
+            if (hitMonster != null) {
+                hitMonster.stun();
+                shots.remove(index);
+                continue;
+                //System.out.println("HIT");
+            }
+
             if (shot.isHitingWall()) {
                 shots.remove(index);
+                continue;
             }
 
             if (shot.isVisible()) {
@@ -195,8 +222,8 @@ public class Board extends JPanel implements Runnable, Commons {
             //System.out.println("WORLDX: " + this.worldx);
             //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
             drawAliens(g);
-            drawPlayer(g);
             drawShots(g);
+            drawPlayer(g);
             //drawBombing(g);
         }
 
@@ -236,6 +263,10 @@ public class Board extends JPanel implements Runnable, Commons {
         player.act();
     }
 
+    public static double getCurrentTime() {
+        return System.currentTimeMillis()/1000.0;
+    }
+
     private void setEventListener() {
         this.frame.setFocusable(true);
         //adapter.setBoard(this.board);
@@ -259,15 +290,15 @@ public class Board extends JPanel implements Runnable, Commons {
                 int shotx = e.getX() - centerx;
                 int shoty = e.getY() - centery;
 
-                Vector vec = new Vector(shotx, shoty).normalise();
+                Vector vec = new Vector(shotx, shoty).getNormalised();
                 vec.scale(20.0);
 
                 Shot shot = new Shot(
                     Board.this,
                     worldx + BOARD_WIDTH/2 - player.getWidth()/2,
                     worldy + BOARD_HEIGHT/2 - player.getHeight(),
-                    vec.x.intValue(),
-                    vec.y.intValue()
+                    vec.x.intValue() + player.dx,
+                    vec.y.intValue() + player.dy
                 );
 
                 shots.add(shot);

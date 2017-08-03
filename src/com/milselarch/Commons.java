@@ -5,13 +5,14 @@ package com.milselarch;
  */
 
 public interface Commons {
-    public static final int BOARD_WIDTH = 1280;
-    public static final int BOARD_HEIGHT = 720;
-    public static final int WORLD_WIDTH = 1280*4;
-    public static final int WORLD_HEIGHT = 720*4;
+    public static final int BOARD_WIDTH = 1200;
+    public static final int BOARD_HEIGHT = 700;
+    public static final int WORLD_WIDTH = 1200*4;
+    public static final int WORLD_HEIGHT = 700*4;
 
     public static final int GROUND = 290;
     public static final int BOMB_HEIGHT = 5;
+    public static final int CHASE_RADIUS = 500;
     public static final int ALIEN_HEIGHT = 12;
     public static final int ALIEN_WIDTH = 12;
     public static final int BORDER_RIGHT = 30;
@@ -19,6 +20,8 @@ public interface Commons {
     public static final int GO_DOWN = 15;
     public static final int NUMBER_OF_ALIENS_TO_DESTROY = 24;
     public static final int CHANCE = 5;
+
+    public static final int STUN_DURATION = 5;
     public static final int DELAY = 17;
     public static final int PLAYER_WIDTH = 15;
     public static final int PLAYER_HEIGHT = 10;

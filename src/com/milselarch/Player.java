@@ -43,6 +43,26 @@ public class Player extends Sprite implements Commons {
         setY(START_Y);
     }
 
+    @Override
+    public int getX() {
+        return this.board.worldx + BOARD_WIDTH/2 - this.getWidth()/2;
+    }
+
+    @Override
+    public int getY() {
+        return this.board.worldy + BOARD_HEIGHT/2 - getHeight();
+    }
+
+    @Override
+    public int getEndX() {
+        return this.board.worldx + this.getWidth()/2 + BOARD_WIDTH;
+    }
+
+    @Override
+    public int getEndY() {
+        return this.board.worldy + this.getHeight()/2 + BOARD_HEIGHT;
+    }
+
     public void act() {
         /*
         x,y coordinates are actually the top left corner of the sprite

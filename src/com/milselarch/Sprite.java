@@ -95,4 +95,42 @@ public class Sprite {
     public boolean isDying() {
         return this.dying;
     }
+
+    public static boolean isColliding(Sprite sprite1, Sprite sprite2) {
+        //https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+        if (sprite1.getX() < sprite2.getX() + sprite2.getWidth() &&
+            sprite1.getX() + sprite1.getWidth() > sprite2.getX() &&
+            sprite1.getY() < sprite2.getY() + sprite2.getHeight() &&
+            sprite1.getHeight() + sprite1.getY() > sprite2.getY()) {
+            return true;
+            // collision detected!
+        }
+
+        return false;
+    }
+
+    public boolean isColliding(Sprite sprite) {
+        return this.isColliding(this, sprite);
+    }
+
+    public static Vector getVectorBetween(Sprite sprite1, Sprite sprite2) {
+        return new Vector(
+            sprite1.getX() - sprite2.getX()
+            + (sprite1.getWidth() - sprite2.getWidth())/2,
+            sprite1.getY() - sprite2.getY()
+            + (sprite1.getHeight() - sprite2.getHeight())/2
+        );
+    }
+
+    public Vector getVectorTo(Sprite sprite) {
+        return this.getVectorBetween(this, sprite);
+    }
+
+    public static Double getDistanceBetween(Sprite sprite1, Sprite sprite2) {
+        return getVectorBetween(sprite1, sprite2).getMagnitude();
+    }
+
+    public Double getDistanceFrom(Sprite sprite) {
+        return this.getVectorBetween(this, sprite).getMagnitude();
+    }
 }

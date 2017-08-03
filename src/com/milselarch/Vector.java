@@ -9,13 +9,30 @@ public class Vector {
         this.y = y;
     }
 
-    public Vector normalise() {
-        double magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-        return new Vector(x/magnitude, y/magnitude);
+    public Double getMagnitude() {
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    public Vector getNormalised() {
+        Vector copy = this.getCopy();
+        copy.normalise();
+        return copy;
+    }
+
+    public void normalise() {
+        double magnitude = this.getMagnitude();
+        this.x /= magnitude;
+        this.y /= magnitude;
+    }
+
+    public Vector getCopy() {
+        return new Vector(x, y);
     }
 
     public void scale(double mul) {
         this.x *= mul;
         this.y *= mul;
     }
+
+
 }
