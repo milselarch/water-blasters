@@ -9,21 +9,20 @@ import javax.swing.ImageIcon;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import static com.milselarch.Commons.*;
+
 public class Shot extends Sprite {
-
     private final String shotImg = "src/images/shot.png";
-    private final int H_SPACE = 6;
-    private final int V_SPACE = 1;
+    private Board board;
 
-    public Shot() {
+    public Shot(Board board, int x, int y, int dx, int dy) {
+        this.board = board;
+        initShot(board, x, y, dx, dy);
     }
 
-    public Shot(int x, int y) {
+    private void initShot(Board board, int x, int y, int dx, int dy) {
+        this.board = board;
 
-        initShot(x, y);
-    }
-
-    private void initShot(int x, int y) {
         try {
             BufferedImage image = ImageIO.read(new File(shotImg));
             this.setImage(image);
@@ -31,7 +30,25 @@ public class Shot extends Sprite {
             System.out.println("IMAGE READ ERROR");
         }
 
-        setX(x + H_SPACE);
-        setY(y - V_SPACE);
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+    }
+
+    public boolean isHitingWall() {
+        if (this.x <= 0) {
+            return true;
+        } else if (this.getEndX() >= WORLD_WIDTH) {
+            return true;
+        }
+
+        if (this.y <= 0) {
+            return true;
+        } else if (this.getEndY() >= WORLD_HEIGHT) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -4,6 +4,7 @@ package com.milselarch;
  * Created by user on 24/7/2017.
  */
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,6 +14,7 @@ import javax.swing.ImageIcon;
 public class Player extends Sprite implements Commons {
     private Board board;
 
+    private final int SPEEDUP = 3;
     private final int START_Y = 580;
     private final int START_X = 470;
 
@@ -52,34 +54,28 @@ public class Player extends Sprite implements Commons {
 
         //System.out.println("DISPLACE X = " + displacex);
 
-        this.board.worldx += dx;
-        this.board.worldy += dy;
+        this.board.worldx += dx * this.SPEEDUP;
+        this.board.worldy += dy * this.SPEEDUP;
 
         if (this.board.worldx <= -displacex) {
             this.board.worldx = -displacex;
-        } else if (this.board.worldx + this.getWidth() >= BOARD_WIDTH - displacex) {
-            this.board.worldx = BOARD_WIDTH - this.getWidth() - displacex;
+        } else if (this.board.worldx + this.getWidth() >= WORLD_WIDTH - displacex) {
+            this.board.worldx = WORLD_WIDTH - this.getWidth() - displacex;
         }
 
         if (this.board.worldy <= -displacey) {
             this.board.worldy = -displacey;
-        } else if (this.board.worldy + this.getHeight() >= BOARD_HEIGHT - displacey) {
-            this.board.worldy = BOARD_HEIGHT - this.getHeight() - displacey;
+        } else if (this.board.worldy + this.getHeight() >= WORLD_HEIGHT - displacey) {
+            this.board.worldy = WORLD_HEIGHT - this.getHeight() - displacey;
         }
+    }
 
-        /*
-        if (x <= BORDER) {
-            x = BORDER;
-        } else if (x + width >= BOARD_WIDTH - 4 * BORDER) {
-            x = BOARD_WIDTH - 4 * BORDER - width;
-        }
-
-        if (y <= BORDER) {
-            y = BORDER;
-        } else if (y >= BOARD_HEIGHT - 6 * BORDER - 2 * height) {
-            y = BOARD_HEIGHT - 6 * BORDER - 2 * height;
-        }
-        */
+    @Override
+    public Dimension getCenter() {
+        return new Dimension(
+            this.board.worldx - this.getWidth()/2,
+            this.board.worldy - this.getHeight()/2
+        );
     }
 
     public void keyPressed(KeyEvent e) {

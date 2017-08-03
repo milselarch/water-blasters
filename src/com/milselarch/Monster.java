@@ -23,8 +23,13 @@ public class Monster extends Sprite implements Commons {
         RandomRange random = new RandomRange();
 
         this.board = board;
-        this.dx = random.rand(-5, 5);
-        this.dy = random.rand(-5, 5);
+        while (this.dx == 0) {
+            this.dx = random.rand(-4, 4);
+        }
+        while (this.dy == 0) {
+            this.dy = random.rand(-4, 4);
+        }
+
         this.x = x;
         this.y = y;
 
@@ -53,16 +58,16 @@ public class Monster extends Sprite implements Commons {
         if (this.x <= 0) {
             this.x = 0;
             this.dx *= -1;
-        } else if (this.getEndX() >= BOARD_WIDTH) {
-            this.x = BOARD_WIDTH - this.getWidth();
+        } else if (this.getEndX() >= WORLD_WIDTH) {
+            this.x = WORLD_WIDTH - this.getWidth();
             this.dx *= -1;
         }
 
         if (this.y <= 0) {
             this.y = 0;
             this.dy *= -1;
-        } else if (this.getEndY() >= BOARD_HEIGHT) {
-            this.y = BOARD_HEIGHT - this.getHeight();
+        } else if (this.getEndY() >= WORLD_HEIGHT) {
+            this.y = WORLD_HEIGHT - this.getHeight();
             this.dy *= -1;
         }
     }

@@ -4,14 +4,8 @@ package com.milselarch;
  * Created by user on 24/7/2017.
  */
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,8 +18,8 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private Dimension d;
     private ArrayList<Monster> monsters;
+    private ArrayList<Shot> shots;
     public Player player;
-    private Shot shot;
 
     private GameUI frame;
 
@@ -85,13 +79,14 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void gameInit() {
         this.monsters = new ArrayList<>();
+        this.shots = new ArrayList<>();
         RandomRange random = new RandomRange();
 
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 100; i++) {
             Monster monster = new Monster(
                 this,
-                random.rand(0, BOARD_WIDTH),
-                random.rand(0, BOARD_HEIGHT)
+                random.rand(0, WORLD_WIDTH),
+                random.rand(0, WORLD_HEIGHT)
             );
 
             monsters.add(monster);
@@ -99,7 +94,6 @@ public class Board extends JPanel implements Runnable, Commons {
 
 
         this.player = new Player(this);
-        shot = new Shot();
 
         if (animator == null || !ingame) {
             animator = new Thread(this);
@@ -144,9 +138,23 @@ public class Board extends JPanel implements Runnable, Commons {
         }
     }
 
-    public void drawShot(Graphics g) {
-        if (shot.isVisible()) {
-            g.drawImage(shot.getImage(), shot.getX(), shot.getY(), this);
+    public void drawShots(Graphics g) {
+        for (int index = shots.size() - 1; index > 0; index--) {
+            Shot shot = shots.get(index);
+            shot.act();
+
+            if (shot.isHitingWall()) {
+                shots.remove(index);
+            }
+
+            if (shot.isVisible()) {
+                g.drawImage(
+                    shot.getImage(),
+                    shot.getX() - this.worldx,
+                    shot.getY() - this.worldy,
+                    this
+                );
+            }
         }
     }
 
@@ -179,8 +187,8 @@ public class Board extends JPanel implements Runnable, Commons {
         g.fillRect(
             -this.worldx,
             -this.worldy,
-            BOARD_WIDTH,
-            BOARD_HEIGHT
+            WORLD_WIDTH,
+            WORLD_HEIGHT
         );
 
         if (ingame) {
@@ -188,7 +196,7 @@ public class Board extends JPanel implements Runnable, Commons {
             //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
             drawAliens(g);
             drawPlayer(g);
-            drawShot(g);
+            drawShots(g);
             //drawBombing(g);
         }
 
@@ -230,9 +238,42 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private void setEventListener() {
         this.frame.setFocusable(true);
-        TAdapter adapter = new TAdapter();
         //adapter.setBoard(this.board);
-        this.frame.addKeyListener(adapter);
+        this.frame.addKeyListener(new TAdapter());
+        this.addMouseListener(new MAdapter());
+    }
+
+    private class MAdapter extends MouseAdapter {
+        //where initialization occurs:
+        //Register for mouse events on blankArea and the panel.
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            final int button = e.getButton();
+
+            if (button == MouseEvent.BUTTON1) {
+                //Dimension center = player.getCenter();
+                final int centerx = getWidth()/2;
+                final int centery = getHeight()/2;
+
+                int shotx = e.getX() - centerx;
+                int shoty = e.getY() - centery;
+
+                Vector vec = new Vector(shotx, shoty).normalise();
+                vec.scale(20.0);
+
+                Shot shot = new Shot(
+                    Board.this,
+                    worldx + BOARD_WIDTH/2 - player.getWidth()/2,
+                    worldy + BOARD_HEIGHT/2 - player.getHeight(),
+                    vec.x.intValue(),
+                    vec.y.intValue()
+                );
+
+                shots.add(shot);
+                System.out.println("XY " + shotx + ", " + shoty);
+            }
+        }
     }
 
     private class TAdapter extends KeyAdapter {
@@ -249,15 +290,7 @@ public class Board extends JPanel implements Runnable, Commons {
             int y = player.getY();
 
             int key = e.getKeyCode();
-            System.out.println(key);
-
-            if (key == KeyEvent.VK_SPACE) {
-                if (ingame) {
-                    if (!shot.isVisible()) {
-                        shot = new Shot(x, y);
-                    }
-                }
-            }
+            //System.out.println(key);
         }
     }
 
