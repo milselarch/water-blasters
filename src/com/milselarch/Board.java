@@ -87,16 +87,14 @@ public class Board extends JPanel implements Runnable, Commons {
         this.monsters = new ArrayList<>();
         RandomRange random = new RandomRange();
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                Monster monster = new Monster(
-                    this,
-                    random.rand(0, BOARD_WIDTH),
-                    random.rand(0, BOARD_HEIGHT)
-                );
+        for (int i = 0; i < 40; i++) {
+            Monster monster = new Monster(
+                this,
+                random.rand(0, BOARD_WIDTH),
+                random.rand(0, BOARD_HEIGHT)
+            );
 
-                monsters.add(monster);
-            }
+            monsters.add(monster);
         }
 
 
@@ -113,11 +111,13 @@ public class Board extends JPanel implements Runnable, Commons {
         Iterator it = monsters.iterator();
 
         for (Monster monster : monsters) {
+            monster.act();
+
             if (monster.isVisible()) {
                 g.drawImage(
                     monster.getImage(),
-                    monster.getX() + this.worldx,
-                    monster.getY() + this.worldy,
+                    monster.getX() - this.worldx,
+                    monster.getY() - this.worldy,
                     this
                 );
             }
@@ -130,7 +130,12 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void drawPlayer(Graphics g) {
         if (player.isVisible()) {
-            g.drawImage(player.getImage(), d.width/2, d.height/2, this);
+            g.drawImage(
+                player.getImage(),
+                d.width/2 - this.player.getWidth()/2,
+                d.height/2 - this.player.getHeight()/2,
+                this
+            );
         }
 
         if (player.isDying()) {
@@ -165,14 +170,21 @@ public class Board extends JPanel implements Runnable, Commons {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.setColor(Color.black);
+        g.setColor(Color.GRAY);
         //System.out.println(this.d);
         g.fillRect(0, 0, d.width, d.height);
         //g.setColor(Color.green);
 
+        g.setColor(Color.BLACK);
+        g.fillRect(
+            -this.worldx,
+            -this.worldy,
+            BOARD_WIDTH,
+            BOARD_HEIGHT
+        );
+
         if (ingame) {
             //System.out.println("WORLDX: " + this.worldx);
-
             //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
             drawAliens(g);
             drawPlayer(g);

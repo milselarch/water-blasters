@@ -14,6 +14,7 @@ public class GameUI extends JFrame implements Commons {
     }
 
     private void initUI() {
+        this.setUndecorated(true);
         JMenuBar menubar = new JMenuBar();
         JMenu file = new JMenu("File");
 

@@ -4,7 +4,10 @@ package com.milselarch;
  * Created by user on 24/7/2017.
  */
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class Shot extends Sprite {
 
@@ -21,9 +24,12 @@ public class Shot extends Sprite {
     }
 
     private void initShot(int x, int y) {
-
-        ImageIcon ii = new ImageIcon(shotImg);
-        setImage(ii.getImage());
+        try {
+            BufferedImage image = ImageIO.read(new File(shotImg));
+            this.setImage(image);
+        } catch (Exception e) {
+            System.out.println("IMAGE READ ERROR");
+        }
 
         setX(x + H_SPACE);
         setY(y - V_SPACE);

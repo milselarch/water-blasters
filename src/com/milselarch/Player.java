@@ -5,6 +5,9 @@ package com.milselarch;
  */
 
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public class Player extends Sprite implements Commons {
@@ -24,12 +27,16 @@ public class Player extends Sprite implements Commons {
     private void initPlayer(Board board) {
         this.board = board;
 
-        ImageIcon ii = new ImageIcon(playerImg);
+        try {
+            BufferedImage image = ImageIO.read(new File(playerImg));
+            this.setImage(image);
+        } catch (Exception e) {
+            System.out.println("IMAGE READ ERROR");
+        }
 
-        width = ii.getImage().getWidth(null);
-        height = ii.getImage().getWidth(null);
+        width = this.getWidth();
+        height = this.getHeight();
 
-        setImage(ii.getImage());
         setX(START_X);
         setY(START_Y);
     }
@@ -39,9 +46,28 @@ public class Player extends Sprite implements Commons {
         x,y coordinates are actually the top left corner of the sprite
         */
         //System.out.println(Integer.toString(x) + ", " +Integer.toString(y) + ", " +Integer.toString(height + y));
+        int displacex = this.board.getWidth()/2 - this.getWidth()/2;
+        int displacey = this.board.getHeight()/2 - this.getHeight()/2;
+
+
+        //System.out.println("DISPLACE X = " + displacex);
+
         this.board.worldx += dx;
         this.board.worldy += dy;
 
+        if (this.board.worldx <= -displacex) {
+            this.board.worldx = -displacex;
+        } else if (this.board.worldx + this.getWidth() >= BOARD_WIDTH - displacex) {
+            this.board.worldx = BOARD_WIDTH - this.getWidth() - displacex;
+        }
+
+        if (this.board.worldy <= -displacey) {
+            this.board.worldy = -displacey;
+        } else if (this.board.worldy + this.getHeight() >= BOARD_HEIGHT - displacey) {
+            this.board.worldy = BOARD_HEIGHT - this.getHeight() - displacey;
+        }
+
+        /*
         if (x <= BORDER) {
             x = BORDER;
         } else if (x + width >= BOARD_WIDTH - 4 * BORDER) {
@@ -53,6 +79,7 @@ public class Player extends Sprite implements Commons {
         } else if (y >= BOARD_HEIGHT - 6 * BORDER - 2 * height) {
             y = BOARD_HEIGHT - 6 * BORDER - 2 * height;
         }
+        */
     }
 
     public void keyPressed(KeyEvent e) {
