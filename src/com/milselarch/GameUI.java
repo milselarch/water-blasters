@@ -1,6 +1,8 @@
 package com.milselarch;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 import javax.swing.*;
@@ -17,10 +19,19 @@ public class GameUI extends JFrame implements Commons {
     private void initUI() {
         this.setUndecorated(true);
         JMenuBar menubar = new JMenuBar();
-        JMenu file = new JMenu("File");
-
-        menubar.add(file);
+        JMenu fileMenu = new JMenu("File");
         setJMenuBar(menubar);
+
+        JMenuItem exitOption = new JMenuItem("Exit");
+        exitOption.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                System.exit(0);
+            }
+        });
+
+
+        fileMenu.add(exitOption);
+        menubar.add(fileMenu);
 
         JToolBar toolbar = new JToolBar();
         toolbar.setFloatable(false);
@@ -101,13 +112,6 @@ public class GameUI extends JFrame implements Commons {
     }
 
     public static void main(String[] args) {
-        /*
-        SwingUtilities.invokeLater(() -> {
-            GameUI ex = new GameUI();
-            ex.setVisible(true);
-        });
-        */
-
         EventQueue.invokeLater(() -> {
             GameUI ex = new GameUI();
             ex.setVisible(true);

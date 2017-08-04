@@ -78,33 +78,38 @@ public class Player extends Sprite implements Commons {
 
     @Override
     public int getX() {
-        return this.board.worldx + BOARD_WIDTH/2 - this.getWidth()/2;
+        return this.board.worldx + this.getDisplacex();
     }
 
     @Override
     public int getY() {
-        return this.board.worldy + BOARD_HEIGHT/2 - this.getHeight();
+        return this.board.worldy + this.getDisplacey();
     }
 
     @Override
     public int getEndX() {
-        return this.board.worldx + this.getWidth()/2 + BOARD_WIDTH;
+        return this.board.worldx + this.getWidth() + this.getDisplacex();
     }
 
     @Override
     public int getEndY() {
-        return this.board.worldy + this.getHeight()/2 + BOARD_HEIGHT;
+        return this.board.worldy + this.getHeight() + this.getDisplacey();
+    }
+
+    public int getDisplacex() {
+        return this.board.getWidth()/2 - this.getWidth()/2;
+    }
+
+    public int getDisplacey() {
+        return this.board.getHeight()/2 - this.getHeight()/2;
     }
 
     public void act() {
         /*
         x,y coordinates are actually the top left corner of the sprite
         */
-        //System.out.println(Integer.toString(x) + ", " +Integer.toString(y) + ", " +Integer.toString(height + y));
-        int displacex = this.board.getWidth()/2 - this.getWidth()/2;
-        int displacey = this.board.getHeight()/2 - this.getHeight()/2;
-
-
+        int displacex = this.getDisplacex();
+        int displacey = this.getDisplacey();
         //System.out.println("DISPLACE X = " + displacex);
 
         this.board.worldx += dx * this.SPEEDUP;
@@ -132,8 +137,8 @@ public class Player extends Sprite implements Commons {
 
             PShot pshot = new PShot(
                 board,
-                this.board.worldx + BOARD_WIDTH/2 - this.getWidth()/2,
-                this.board.worldy + BOARD_HEIGHT/2 - this.getHeight(),
+                this.getX(),
+                this.getY(),
                 vec.x.intValue() + this.dx,
                 vec.y.intValue() + this.dy
             );

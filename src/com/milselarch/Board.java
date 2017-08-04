@@ -27,18 +27,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private GameUI frame;
 
-    //TAdapter eventListener;
-
-    private final int ALIEN_INIT_X = 150;
-    private final int ALIEN_INIT_Y = 5;
-    private int direction = -1;
-    private int deaths = 0;
-
-    private boolean ingame = true;
-    private boolean winGame = false;
-    private final String explImg = "src/images/explosion.png";
-    private String message = "Game Over";
-
+    private int gameStatus = GAME_START;
     private Thread animator;
 
     Board(GameUI frame) {
@@ -67,8 +56,8 @@ public class Board extends JPanel implements Runnable, Commons {
         setDoubleBuffered(true);
     }
 
-    public boolean isIngame() {
-        return this.ingame;
+    public int getGameStatus() {
+        return this.gameStatus;
     }
 
     public Player getPlayer() {
@@ -90,7 +79,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
         RandomRange random = new RandomRange();
 
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < DIRTY_WATERS; i++) {
             Monster monster = new Monster(
                 this,
                 random.rand(0, WORLD_WIDTH),
@@ -100,7 +89,7 @@ public class Board extends JPanel implements Runnable, Commons {
             monsters.add(monster);
         }
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < CLEAN_WATERS; i++) {
             CleanWater water = new CleanWater(
                 this,
                 random.rand(0, WORLD_WIDTH),
@@ -112,7 +101,8 @@ public class Board extends JPanel implements Runnable, Commons {
 
         this.player = new Player(this);
 
-        if (animator == null || !ingame) {
+        if (animator == null
+                ) {
             animator = new Thread(this);
             animator.start();
         }
@@ -157,12 +147,19 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawCleanWaters(Graphics g) {
-        for (int index = cleanWaters.size() - 1; index > 0; index--) {
+        for (int index = cleanWaters.size() - 1; index >= 0; index--) {
             CleanWater water = cleanWaters.get(index);
+            water.act();
+
             if (player.isColliding(water)) {
                 cleanWaters.remove(index);
                 player.resetHealth();
                 this.frame.updateStatusBar();
+
+                if (this.numOfCleanWaters() == 0) {
+                    this.gameStatus = GAME_WON;
+                }
+
                 continue;
             }
 
@@ -171,7 +168,7 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawShots(Graphics g) {
-        for (int index = pshots.size() - 1; index > 0; index--) {
+        for (int index = pshots.size() - 1; index >= 0; index--) {
             PShot pshot = pshots.get(index);
             pshot.act();
 
@@ -191,7 +188,7 @@ public class Board extends JPanel implements Runnable, Commons {
             pshot.draw(g);
         }
 
-        for (int index = eshots.size() - 1; index > 0; index--) {
+        for (int index = eshots.size() - 1; index >= 0; index--) {
             EShot eshot = eshots.get(index);
             eshot.act();
 
@@ -204,7 +201,7 @@ public class Board extends JPanel implements Runnable, Commons {
                 eshots.remove(index);
                 player.loseHealth();
                 if (player.health == 0) {
-                    this.ingame = false;
+                    this.gameStatus = GAME_LOST;
                 }
 
                 continue;
@@ -233,7 +230,7 @@ public class Board extends JPanel implements Runnable, Commons {
         g.fillRect(0, 0, d.width, d.height);
         this.frame.updateStatusBar();
 
-        if (this.isIngame()) {
+        if (this.gameStatus == GAME_INGAME) {
             //super.paintComponent(g);
             //System.out.println("INGAME");
             this.updateMousePosition();
@@ -246,19 +243,22 @@ public class Board extends JPanel implements Runnable, Commons {
                 WORLD_HEIGHT
             );
 
-            if (ingame) {
-                //System.out.println("WORLDX: " + this.worldx);
-                //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
-                drawAliens(g);
-                drawCleanWaters(g);
-                drawShots(g);
-                drawPlayer(g);
-                //drawBombing(g);
-            }
+            //System.out.println("WORLDX: " + this.worldx);
+            //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
+            drawAliens(g);
+            drawCleanWaters(g);
+            drawShots(g);
+            drawPlayer(g);
+            //drawBombing(g);
 
-
-        } else {
+        } else if (gameStatus == GAME_LOST) {
             this.gameOver(g);
+
+        } else if (gameStatus == GAME_WON) {
+            this.gameWon(g);
+
+        } else if (gameStatus == GAME_START) {
+            this.gameStart(g);
         }
 
         Toolkit.getDefaultToolkit().sync();
@@ -266,62 +266,36 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void gameOver(Graphics g) {
-        this.monsters.clear();
+        String texts[] = {
+            "Game Over",
+            "It's hard cos only 3% of water is fresh",
+            "Press enter to restart"
+        };
 
-        g.setColor(Color.black);
-        g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-
-        g.setColor(new Color(0, 32, 48));
-        g.fillRect(
-            50,
-            BOARD_WIDTH / 2 - 30,
-            BOARD_WIDTH - 100,
-            50
-        );
-
-        g.setColor(Color.white);
-        g.drawRect(
-            50,
-            BOARD_WIDTH / 2 - 30,
-            BOARD_WIDTH - 100,
-            (BOARD_HEIGHT) / 2
-        );
-
-        Font font = new Font(
-            "Helvetica",
-            Font.BOLD,
-            30
-        );
-
-        FontMetrics metr = this.getFontMetrics(font);
-
-        g.setColor(Color.white);
-        g.setFont(font);
-        message = "Game Over";
-        g.drawString(
-            message,
-            (BOARD_WIDTH - metr.stringWidth(message)) / 2,
-            BOARD_HEIGHT/2 - metr.getHeight()
-        );
-
-        message = "Only 3% of the world's water is fresh";
-        g.drawString(
-            message,
-            (BOARD_WIDTH - metr.stringWidth(message)) / 2,
-            BOARD_HEIGHT/2
-        );
-
-        message = "Press Enter to try again";
-        g.drawString(
-            message,
-            (BOARD_WIDTH - metr.stringWidth(message)) / 2,
-            BOARD_HEIGHT/2 + metr.getHeight()
-        );
-
+        new ScreenText(g).display(texts);
     }
 
-    public void gameWin() {
+    public void gameWon(Graphics g) {
+        String texts[] = {
+            "You Win!",
+            "It's hard cos only 3% of water is fresh",
+            "and only 0.3% of water is usable by humans",
+            "Press enter to restart"
+        };
 
+        new ScreenText(g).display(texts);
+    }
+
+    public void gameStart(Graphics g) {
+        String texts[] = {
+            "The year is 2099",
+            "All the dirty water in the world was turned to monsters",
+            "Collect all the clean waters to find a cure",
+            "Click to shoot mosnters and stun them",
+            "Press enter to start"
+        };
+
+        new ScreenText(g).display(texts);
     }
 
     public static double getCurrentTime() {
@@ -369,16 +343,13 @@ public class Board extends JPanel implements Runnable, Commons {
         public void keyPressed(KeyEvent e) {
             player.keyPressed(e);
 
-            int x = player.getX();
-            int y = player.getY();
-
             int key = e.getKeyCode();
             if (key == KeyEvent.VK_ENTER) {
                 //System.out.println("ENTER");
 
-                if (!Board.this.ingame) {
+                if (gameStatus != GAME_INGAME) {
                     //System.out.println("ENTER");
-                    Board.this.ingame = true;
+                    Board.this.gameStatus = GAME_INGAME;
                     initBoard();
                 }
             }
