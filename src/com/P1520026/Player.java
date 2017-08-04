@@ -1,4 +1,4 @@
-package com.milselarch;
+package com.P1520026;
 
 /**
  * Created by user on 24/7/2017.
@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 public class Player extends Sprite implements Commons {
     private Board board;

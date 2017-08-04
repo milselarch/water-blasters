@@ -1,11 +1,10 @@
-package com.milselarch;
+package com.P1520026;
 
 /**
  * Created by user on 24/7/2017.
  */
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;

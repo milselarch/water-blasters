@@ -1,11 +1,11 @@
-package com.milselarch;
+package com.P1520026;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import static com.milselarch.Commons.*;
+import static com.P1520026.Commons.*;
 
 public class CleanWater extends Sprite {
     private Board board;

@@ -1,4 +1,4 @@
-package com.milselarch;
+package com.P1520026;
 
 /**
  * Created by user on 24/7/2017.
@@ -23,8 +23,8 @@ public class Board extends JPanel implements Runnable, Commons {
     ArrayList<CleanWater> cleanWaters;
     ArrayList<PShot> pshots;
     ArrayList<EShot> eshots;
-    public Player player;
 
+    public Player player;
     private GameUI frame;
 
     private int gameStatus = GAME_START;

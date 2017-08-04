@@ -1,4 +1,4 @@
-package com.milselarch;
+package com.P1520026;
 
 public class PShot extends Shot {
     private final String shotImg = "src/images/pshot.png";

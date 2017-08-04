@@ -1,8 +1,7 @@
-package com.milselarch;
+package com.P1520026;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 
 import javax.swing.*;
@@ -19,6 +18,7 @@ public class GameUI extends JFrame implements Commons {
     private void initUI() {
         this.setUndecorated(true);
         JMenuBar menubar = new JMenuBar();
+
         JMenu fileMenu = new JMenu("File");
         setJMenuBar(menubar);
 
@@ -33,6 +33,34 @@ public class GameUI extends JFrame implements Commons {
         fileMenu.add(exitOption);
         menubar.add(fileMenu);
 
+        JMenu helpMenu = new JMenu("Help");
+        JMenuItem aboutOption = new JMenuItem("About");
+        aboutOption.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                    GameUI.this,
+                    "Water Blasters Lim Thian Yew P1520026 AY17S1"
+                );
+            }
+        });
+
+        JMenuItem guideOption = new JMenuItem("User Guide");
+        guideOption.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                    GameUI.this,
+                    "Enter to start/restart " +
+                        "\n WASD or arrow keys to move " +
+                        "\n click to shoot " +
+                        "\n Win by moving to all the clean waters"
+                );
+            }
+        });
+
+        helpMenu.add(aboutOption);
+        helpMenu.add(guideOption);
+
+        menubar.add(helpMenu);
         JToolBar toolbar = new JToolBar();
         toolbar.setFloatable(false);
 
@@ -90,6 +118,29 @@ public class GameUI extends JFrame implements Commons {
         );
 
         this.board.gameInit();
+    }
+
+    class PopupListener extends MouseAdapter {
+        JPopupMenu popup;
+
+        PopupListener(JPopupMenu popupMenu) {
+            popup = popupMenu;
+        }
+
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                popup.show(e.getComponent(),
+                        e.getX(), e.getY());
+            }
+        }
     }
 
     void updateStatusBar() {

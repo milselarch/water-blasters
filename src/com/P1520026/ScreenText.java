@@ -1,9 +1,9 @@
-package com.milselarch;
+package com.P1520026;
 
 import java.awt.*;
 
-import static com.milselarch.Commons.BOARD_HEIGHT;
-import static com.milselarch.Commons.BOARD_WIDTH;
+import static com.P1520026.Commons.BOARD_HEIGHT;
+import static com.P1520026.Commons.BOARD_WIDTH;
 
 public class ScreenText {
     private Graphics g;
