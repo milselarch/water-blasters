@@ -6,6 +6,7 @@ package com.milselarch;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -34,6 +35,15 @@ public class Shot extends Sprite {
         this.y = y;
         this.dx = dx;
         this.dy = dy;
+    }
+
+    public void draw(Graphics g) {
+        g.drawImage(
+            this.getImage(),
+            this.getX() - this.board.worldx,
+            this.getY() - this.board.worldy,
+            this.board
+        );
     }
 
     public boolean isHitingWall() {

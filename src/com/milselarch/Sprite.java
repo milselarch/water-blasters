@@ -10,8 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Sprite {
-    private boolean visible;
-
     private BufferedImage image;
 
     protected int x = 0;
@@ -19,10 +17,6 @@ public class Sprite {
     protected boolean dying = false;
     protected int dx = 0;
     protected int dy = 0;
-
-    public Sprite() {
-        visible = true;
-    }
 
     public boolean loadImage(String filename) {
         try {
@@ -34,18 +28,6 @@ public class Sprite {
             System.out.println("IMAGE READ ERROR");
             return false;
         }
-    }
-
-    public void die() {
-        visible = false;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    protected void setVisible(boolean visible) {
-        this.visible = visible;
     }
 
     public void setImage(BufferedImage image) {
@@ -98,6 +80,24 @@ public class Sprite {
 
     public int getEndY() {
         return this.y + this.getHeight();
+    }
+
+    public void onWallCollide(int x1, int y1, int x2, int y2) {
+        if (this.x <= x1) {
+            this.x = x1;
+            this.dx *= -1;
+        } else if (this.getEndX() >= x2) {
+            this.x = x2 - this.getWidth();
+            this.dx *= -1;
+        }
+
+        if (this.y <= y1) {
+            this.y = y1;
+            this.dy *= -1;
+        } else if (this.getEndY() >= y2) {
+            this.y = y2 - this.getHeight();
+            this.dy *= -1;
+        }
     }
 
     public void setDying(boolean dying) {

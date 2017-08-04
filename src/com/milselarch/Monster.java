@@ -13,7 +13,6 @@ import java.io.File;
 public class Monster extends Sprite implements Commons {
     private Board board;
     private Cooldown shotCooldown;
-    private Bomb bomb;
 
     private Double speedup = 1.0;
 
@@ -33,7 +32,6 @@ public class Monster extends Sprite implements Commons {
         this.x = x;
         this.y = y;
 
-        bomb = new Bomb(x, y);
         this.setRandomMotion();
 
         try {
@@ -78,8 +76,8 @@ public class Monster extends Sprite implements Commons {
     }
 
     public void fireShot(Vector direction) {
-        if (this.shotCooldown.startIfCooledDown()) {
-            direction.scale(5.0);
+        if (!stunned() && this.shotCooldown.startIfCooledDown()) {
+            direction.scale(8.0);
 
             EShot eshot = new EShot(
                 this.board, this.getX(), this.getY(),
@@ -91,39 +89,14 @@ public class Monster extends Sprite implements Commons {
         }
     }
 
-    public int getEndX() {
-        return this.x + this.getWidth();
-    }
-
-    public int getEndY() {
-        return this.y + this.getHeight();
-    }
-
     public boolean stunned() {
         return this.board.getCurrentTime() - this.lastStun < STUN_DURATION;
     }
 
+    @Override
     public void act() {
-        if (!this.stunned()) {
-            this.x += this.dx;
-            this.y += this.dy;
-        }
-
-        if (this.x <= 0) {
-            this.x = 0;
-            this.dx *= -1;
-        } else if (this.getEndX() >= WORLD_WIDTH) {
-            this.x = WORLD_WIDTH - this.getWidth();
-            this.dx *= -1;
-        }
-
-        if (this.y <= 0) {
-            this.y = 0;
-            this.dy *= -1;
-        } else if (this.getEndY() >= WORLD_HEIGHT) {
-            this.y = WORLD_HEIGHT - this.getHeight();
-            this.dy *= -1;
-        }
+        if (!this.stunned()) { super.act(); }
+        this.onWallCollide(0,0, WORLD_WIDTH, WORLD_HEIGHT);
     }
 
     public void draw(Graphics2D g2d) {
@@ -149,39 +122,5 @@ public class Monster extends Sprite implements Commons {
 
     public void stun() {
         this.lastStun = board.getCurrentTime();
-    }
-
-    public Bomb getBomb() {
-        return bomb;
-    }
-
-    public class Bomb extends Sprite {
-        private final String bombImg = "src/images/bomb.png";
-        private boolean destroyed;
-
-        public Bomb(int x, int y) {
-            initBomb(x, y);
-        }
-
-        private void initBomb(int x, int y) {
-            setDestroyed(true);
-            this.x = x;
-            this.y = y;
-
-            try {
-                BufferedImage image = ImageIO.read(new File(bombImg));
-                this.setImage(image);
-            } catch (Exception e) {
-                System.out.println("IMAGE READ ERROR");
-            }
-        }
-
-        public void setDestroyed(boolean destroyed) {
-            this.destroyed = destroyed;
-        }
-
-        public boolean isDestroyed() {
-            return destroyed;
-        }
     }
 }

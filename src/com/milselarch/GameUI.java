@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 public class GameUI extends JFrame implements Commons {
     private static Board board;
+    JLabel statusbar;
 
     public GameUI() {
         initUI();
@@ -53,7 +54,8 @@ public class GameUI extends JFrame implements Commons {
         //add(vertical, BorderLayout.WEST);
 
         //make statusbar
-        JLabel statusbar = new JLabel(" Statusbar");
+        this.statusbar = new JLabel();
+        //this.updateStatusBar();
         add(statusbar, BorderLayout.SOUTH);
 
         this.insertGame();
@@ -77,6 +79,12 @@ public class GameUI extends JFrame implements Commons {
         );
 
         this.board.gameInit();
+    }
+
+    void updateStatusBar() {
+        this.statusbar.setText(
+            " collect " + this.board.numOfCleanWaters() + " more waters"
+        );
     }
 
     private void insertGame() {

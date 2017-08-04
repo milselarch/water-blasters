@@ -15,4 +15,16 @@ public class EShot extends Shot {
 
         return false;
     }
+
+    public Monster getHitStunnedMonster() {
+        for (Monster monster : this.board.monsters) {
+            if (Sprite.isColliding(this, monster)) {
+                if (monster.stunned()) {
+                    return monster;
+                }
+            }
+        }
+
+        return null;
+    }
 }

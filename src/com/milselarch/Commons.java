@@ -11,25 +11,13 @@ public interface Commons {
     public static final int WORLD_HEIGHT = 700*4;
 
     public static final int PLAYER_HEALTH = 10;
+    public static final int CLEAN_WATERS = 6;
 
-    public static final int GROUND = 290;
-    public static final int BOMB_HEIGHT = 5;
     public static final int CHASE_RADIUS = 500;
-    public static final int ALIEN_HEIGHT = 12;
-    public static final int ALIEN_WIDTH = 12;
-    public static final int BORDER_RIGHT = 30;
-    public static final int BORDER_LEFT = 5;
-    public static final int GO_DOWN = 15;
-    public static final int NUMBER_OF_ALIENS_TO_DESTROY = 24;
-    public static final int CHANCE = 5;
 
     public static final double ENEMY_SHOT_COOLDOWN = 3;
-    public static final double PLAYER_SHOT_COOLDOWN = 0.15;
+    public static final double PLAYER_SHOT_COOLDOWN = 0.2;
 
     public static final int STUN_DURATION = 5;
     public static final int DELAY = 17;
-    public static final int PLAYER_WIDTH = 15;
-    public static final int PLAYER_HEIGHT = 10;
-
-    public static final int BORDER = 2;
 }

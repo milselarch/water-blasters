@@ -20,6 +20,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
     private Dimension d;
     ArrayList<Monster> monsters;
+    ArrayList<CleanWater> cleanWaters;
     ArrayList<PShot> pshots;
     ArrayList<EShot> eshots;
     public Player player;
@@ -34,6 +35,7 @@ public class Board extends JPanel implements Runnable, Commons {
     private int deaths = 0;
 
     private boolean ingame = true;
+    private boolean winGame = false;
     private final String explImg = "src/images/explosion.png";
     private String message = "Game Over";
 
@@ -82,8 +84,10 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void gameInit() {
         this.monsters = new ArrayList<>();
+        this.cleanWaters = new ArrayList<>();
         this.pshots = new ArrayList<>();
         this.eshots = new ArrayList<>();
+
         RandomRange random = new RandomRange();
 
         for (int i = 0; i < 200; i++) {
@@ -96,12 +100,26 @@ public class Board extends JPanel implements Runnable, Commons {
             monsters.add(monster);
         }
 
+        for (int i = 0; i < 6; i++) {
+            CleanWater water = new CleanWater(
+                this,
+                random.rand(0, WORLD_WIDTH),
+                random.rand(0, WORLD_HEIGHT)
+            );
+
+            cleanWaters.add(water);
+        }
+
         this.player = new Player(this);
 
         if (animator == null || !ingame) {
             animator = new Thread(this);
             animator.start();
         }
+    }
+
+    public int numOfCleanWaters() {
+        return cleanWaters.size();
     }
 
     public void drawAliens(Graphics g) {
@@ -119,28 +137,14 @@ public class Board extends JPanel implements Runnable, Commons {
             );
 
             monster.charge(distance);
-
-            if (monster.isVisible()) {
-                monster.draw(g2d);
-            }
-
-            if (monster.isDying()) {
-                monster.die();
-            }
+            monster.draw(g2d);
         }
     }
 
     public void drawPlayer(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-
-        if (player.isVisible()) {
-            player.draw(g2d);
-        }
-
-        if (player.isDying()) {
-            player.die();
-            ingame = false;
-        }
+        player.act();
+        player.draw(g2d);
     }
 
     private void updateMousePosition() {
@@ -149,6 +153,20 @@ public class Board extends JPanel implements Runnable, Commons {
         if (mousePos != null) {
             this.mousex = mousePos.getX();
             this.mousey = mousePos.getY();
+        }
+    }
+
+    public void drawCleanWaters(Graphics g) {
+        for (int index = cleanWaters.size() - 1; index > 0; index--) {
+            CleanWater water = cleanWaters.get(index);
+            if (player.isColliding(water)) {
+                cleanWaters.remove(index);
+                player.resetHealth();
+                this.frame.updateStatusBar();
+                continue;
+            }
+
+            water.draw(g);
         }
     }
 
@@ -170,14 +188,7 @@ public class Board extends JPanel implements Runnable, Commons {
                 continue;
             }
 
-            if (pshot.isVisible()) {
-                g.drawImage(
-                    pshot.getImage(),
-                    pshot.getX() - this.worldx,
-                    pshot.getY() - this.worldy,
-                    this
-                );
-            }
+            pshot.draw(g);
         }
 
         for (int index = eshots.size() - 1; index > 0; index--) {
@@ -195,27 +206,16 @@ public class Board extends JPanel implements Runnable, Commons {
                 if (player.health == 0) {
                     this.ingame = false;
                 }
+
                 continue;
             }
 
-            if (eshot.isVisible()) {
-                g.drawImage(
-                    eshot.getImage(),
-                    eshot.getX() - this.worldx,
-                    eshot.getY() - this.worldy,
-                    this
-                );
+            if (eshot.getHitStunnedMonster() != null) {
+                eshots.remove(index);
+                continue;
             }
-        }
-    }
 
-    public void drawBombing(Graphics g) {
-        for (Monster a : monsters) {
-            Monster.Bomb b = a.getBomb();
-
-            if (!b.isDestroyed()) {
-                g.drawImage(b.getImage(), b.getX(), b.getY(), this);
-            }
+            eshot.draw(g);
         }
     }
 
@@ -228,37 +228,45 @@ public class Board extends JPanel implements Runnable, Commons {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.updateMousePosition();
-
         g.setColor(Color.GRAY);
         //System.out.println(this.d);
         g.fillRect(0, 0, d.width, d.height);
-        //g.setColor(Color.green);
+        this.frame.updateStatusBar();
 
-        g.setColor(Color.BLACK);
-        g.fillRect(
-            -this.worldx,
-            -this.worldy,
-            WORLD_WIDTH,
-            WORLD_HEIGHT
-        );
+        if (this.isIngame()) {
+            //super.paintComponent(g);
+            //System.out.println("INGAME");
+            this.updateMousePosition();
 
-        if (ingame) {
-            //System.out.println("WORLDX: " + this.worldx);
-            //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
-            drawAliens(g);
-            drawShots(g);
-            drawPlayer(g);
-            //drawBombing(g);
+            g.setColor(Color.BLACK);
+            g.fillRect(
+                -this.worldx,
+                -this.worldy,
+                WORLD_WIDTH,
+                WORLD_HEIGHT
+            );
+
+            if (ingame) {
+                //System.out.println("WORLDX: " + this.worldx);
+                //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
+                drawAliens(g);
+                drawCleanWaters(g);
+                drawShots(g);
+                drawPlayer(g);
+                //drawBombing(g);
+            }
+
+
+        } else {
+            this.gameOver(g);
         }
 
         Toolkit.getDefaultToolkit().sync();
         g.dispose();
     }
 
-    public void gameOver() {
+    public void gameOver(Graphics g) {
         this.monsters.clear();
-        Graphics g = this.getGraphics();
 
         g.setColor(Color.black);
         g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
@@ -279,31 +287,41 @@ public class Board extends JPanel implements Runnable, Commons {
             (BOARD_HEIGHT) / 2
         );
 
-        Font small = new Font(
+        Font font = new Font(
             "Helvetica",
             Font.BOLD,
             30
         );
 
-        FontMetrics metr = this.getFontMetrics(small);
+        FontMetrics metr = this.getFontMetrics(font);
 
         g.setColor(Color.white);
-        g.setFont(small);
+        g.setFont(font);
+        message = "Game Over";
         g.drawString(
             message,
             (BOARD_WIDTH - metr.stringWidth(message)) / 2,
-            (BOARD_HEIGHT) / 2
+            BOARD_HEIGHT/2 - metr.getHeight()
         );
+
+        message = "Only 3% of the world's water is fresh";
+        g.drawString(
+            message,
+            (BOARD_WIDTH - metr.stringWidth(message)) / 2,
+            BOARD_HEIGHT/2
+        );
+
+        message = "Press Enter to try again";
+        g.drawString(
+            message,
+            (BOARD_WIDTH - metr.stringWidth(message)) / 2,
+            BOARD_HEIGHT/2 + metr.getHeight()
+        );
+
     }
 
-    public void animationCycle() {
-        if (deaths == NUMBER_OF_ALIENS_TO_DESTROY) {
-            ingame = false;
-            message = "Game won!";
-        }
+    public void gameWin() {
 
-        // player
-        player.act();
     }
 
     public static double getCurrentTime() {
@@ -355,6 +373,16 @@ public class Board extends JPanel implements Runnable, Commons {
             int y = player.getY();
 
             int key = e.getKeyCode();
+            if (key == KeyEvent.VK_ENTER) {
+                //System.out.println("ENTER");
+
+                if (!Board.this.ingame) {
+                    //System.out.println("ENTER");
+                    Board.this.ingame = true;
+                    initBoard();
+                }
+            }
+
             //System.out.println(key);
         }
     }
@@ -364,11 +392,10 @@ public class Board extends JPanel implements Runnable, Commons {
         long beforeTime, timeDiff, sleep;
         beforeTime = System.currentTimeMillis();
 
-        while (ingame) {
+        while (true) {
             //System.out.println("POTATOXXX");
 
             this.repaint();
-            animationCycle();
 
             timeDiff = System.currentTimeMillis() - beforeTime;
             sleep = DELAY - timeDiff;
@@ -384,8 +411,7 @@ public class Board extends JPanel implements Runnable, Commons {
             }
 
             beforeTime = System.currentTimeMillis();
-        }
 
-        this.gameOver();
+        }
     }
 }

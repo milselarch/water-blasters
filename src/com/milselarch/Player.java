@@ -47,6 +47,10 @@ public class Player extends Sprite implements Commons {
         setY(START_Y);
     }
 
+    public void resetHealth() {
+        this.health = PLAYER_HEALTH;
+    }
+
     public void loseHealth() {
         if (this.health > 0) {
             this.health--;
@@ -54,7 +58,7 @@ public class Player extends Sprite implements Commons {
     }
 
     public void draw(Graphics2D g2d) {
-        float opacity = health / ((float) PLAYER_HEALTH);
+        float opacity = (health + 1) / ((float) PLAYER_HEALTH + 1);
 
         g2d.setComposite(
             AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity)
@@ -79,7 +83,7 @@ public class Player extends Sprite implements Commons {
 
     @Override
     public int getY() {
-        return this.board.worldy + BOARD_HEIGHT/2 - getHeight();
+        return this.board.worldy + BOARD_HEIGHT/2 - this.getHeight();
     }
 
     @Override
