@@ -15,10 +15,13 @@ import javax.swing.*;
 public class Board extends JPanel implements Runnable, Commons {
     public int worldx = 0;
     public int worldy = 0;
+    public double mousex = 1;
+    public double mousey = 1;
 
     private Dimension d;
     ArrayList<Monster> monsters;
-    ArrayList<Shot> shots;
+    ArrayList<PShot> pshots;
+    ArrayList<EShot> eshots;
     public Player player;
 
     private GameUI frame;
@@ -79,7 +82,8 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void gameInit() {
         this.monsters = new ArrayList<>();
-        this.shots = new ArrayList<>();
+        this.pshots = new ArrayList<>();
+        this.eshots = new ArrayList<>();
         RandomRange random = new RandomRange();
 
         for (int i = 0; i < 200; i++) {
@@ -91,7 +95,6 @@ public class Board extends JPanel implements Runnable, Commons {
 
             monsters.add(monster);
         }
-
 
         this.player = new Player(this);
 
@@ -118,20 +121,7 @@ public class Board extends JPanel implements Runnable, Commons {
             monster.charge(distance);
 
             if (monster.isVisible()) {
-                float opacity;
-                if (monster.stunned()) { opacity = 0.5f; }
-                else { opacity = 1; }
-
-                g2d.setComposite(
-                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity)
-                );
-
-                g2d.drawImage(
-                    monster.getImage(),
-                    monster.getX() - this.worldx,
-                    monster.getY() - this.worldy,
-                    this
-                );
+                monster.draw(g2d);
             }
 
             if (monster.isDying()) {
@@ -141,13 +131,10 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void drawPlayer(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+
         if (player.isVisible()) {
-            g.drawImage(
-                player.getImage(),
-                d.width/2 - this.player.getWidth()/2,
-                d.height/2 - this.player.getHeight()/2,
-                this
-            );
+            player.draw(g2d);
         }
 
         if (player.isDying()) {
@@ -156,29 +143,66 @@ public class Board extends JPanel implements Runnable, Commons {
         }
     }
 
-    public void drawShots(Graphics g) {
-        for (int index = shots.size() - 1; index > 0; index--) {
-            Shot shot = shots.get(index);
-            shot.act();
+    private void updateMousePosition() {
+        Point mousePos = this.getMousePosition();
 
-            Monster hitMonster = shot.getHitMonster();
+        if (mousePos != null) {
+            this.mousex = mousePos.getX();
+            this.mousey = mousePos.getY();
+        }
+    }
+
+    public void drawShots(Graphics g) {
+        for (int index = pshots.size() - 1; index > 0; index--) {
+            PShot pshot = pshots.get(index);
+            pshot.act();
+
+            Monster hitMonster = pshot.getHitMonster();
             if (hitMonster != null) {
                 hitMonster.stun();
-                shots.remove(index);
+                pshots.remove(index);
                 continue;
                 //System.out.println("HIT");
             }
 
-            if (shot.isHitingWall()) {
-                shots.remove(index);
+            if (pshot.isHitingWall()) {
+                pshots.remove(index);
                 continue;
             }
 
-            if (shot.isVisible()) {
+            if (pshot.isVisible()) {
                 g.drawImage(
-                    shot.getImage(),
-                    shot.getX() - this.worldx,
-                    shot.getY() - this.worldy,
+                    pshot.getImage(),
+                    pshot.getX() - this.worldx,
+                    pshot.getY() - this.worldy,
+                    this
+                );
+            }
+        }
+
+        for (int index = eshots.size() - 1; index > 0; index--) {
+            EShot eshot = eshots.get(index);
+            eshot.act();
+
+            if (eshot.isHitingWall()) {
+                eshots.remove(index);
+                continue;
+            }
+
+            if (eshot.isColliding(player)) {
+                eshots.remove(index);
+                player.loseHealth();
+                if (player.health == 0) {
+                    this.ingame = false;
+                }
+                continue;
+            }
+
+            if (eshot.isVisible()) {
+                g.drawImage(
+                    eshot.getImage(),
+                    eshot.getX() - this.worldx,
+                    eshot.getY() - this.worldy,
                     this
                 );
             }
@@ -204,6 +228,7 @@ public class Board extends JPanel implements Runnable, Commons {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        this.updateMousePosition();
 
         g.setColor(Color.GRAY);
         //System.out.println(this.d);
@@ -232,24 +257,42 @@ public class Board extends JPanel implements Runnable, Commons {
     }
 
     public void gameOver() {
+        this.monsters.clear();
         Graphics g = this.getGraphics();
 
         g.setColor(Color.black);
         g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
 
         g.setColor(new Color(0, 32, 48));
-        g.fillRect(50, BOARD_WIDTH / 2 - 30, BOARD_WIDTH - 100, 50);
-        g.setColor(Color.white);
-        g.drawRect(50, BOARD_WIDTH / 2 - 30, BOARD_WIDTH - 100, 50);
+        g.fillRect(
+            50,
+            BOARD_WIDTH / 2 - 30,
+            BOARD_WIDTH - 100,
+            50
+        );
 
-        Font small = new Font("Helvetica", Font.BOLD, 14);
+        g.setColor(Color.white);
+        g.drawRect(
+            50,
+            BOARD_WIDTH / 2 - 30,
+            BOARD_WIDTH - 100,
+            (BOARD_HEIGHT) / 2
+        );
+
+        Font small = new Font(
+            "Helvetica",
+            Font.BOLD,
+            30
+        );
+
         FontMetrics metr = this.getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(
-            message, (BOARD_WIDTH - metr.stringWidth(message)) / 2,
-            BOARD_WIDTH / 2
+            message,
+            (BOARD_WIDTH - metr.stringWidth(message)) / 2,
+            (BOARD_HEIGHT) / 2
         );
     }
 
@@ -284,25 +327,16 @@ public class Board extends JPanel implements Runnable, Commons {
 
             if (button == MouseEvent.BUTTON1) {
                 //Dimension center = player.getCenter();
-                final int centerx = getWidth()/2;
-                final int centery = getHeight()/2;
+                player.isShooting = true;
+            }
+        }
 
-                int shotx = e.getX() - centerx;
-                int shoty = e.getY() - centery;
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            final int button = e.getButton();
 
-                Vector vec = new Vector(shotx, shoty).getNormalised();
-                vec.scale(20.0);
-
-                Shot shot = new Shot(
-                    Board.this,
-                    worldx + BOARD_WIDTH/2 - player.getWidth()/2,
-                    worldy + BOARD_HEIGHT/2 - player.getHeight(),
-                    vec.x.intValue() + player.dx,
-                    vec.y.intValue() + player.dy
-                );
-
-                shots.add(shot);
-                System.out.println("XY " + shotx + ", " + shoty);
+            if (button == MouseEvent.BUTTON1) {
+                player.isShooting = false;
             }
         }
     }
@@ -352,6 +386,6 @@ public class Board extends JPanel implements Runnable, Commons {
             beforeTime = System.currentTimeMillis();
         }
 
-        gameOver();
+        this.gameOver();
     }
 }

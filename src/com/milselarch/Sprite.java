@@ -24,6 +24,18 @@ public class Sprite {
         visible = true;
     }
 
+    public boolean loadImage(String filename) {
+        try {
+            BufferedImage image = ImageIO.read(new File(filename));
+            this.setImage(image);
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("IMAGE READ ERROR");
+            return false;
+        }
+    }
+
     public void die() {
         visible = false;
     }

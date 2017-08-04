@@ -12,8 +12,8 @@ import java.io.File;
 import static com.milselarch.Commons.*;
 
 public class Shot extends Sprite {
-    private final String shotImg = "src/images/shot.png";
-    private Board board;
+    String shotImg = "src/images/shot.png";
+    Board board;
 
     public Shot(Board board, int x, int y, int dx, int dy) {
         this.board = board;
@@ -24,7 +24,7 @@ public class Shot extends Sprite {
         this.board = board;
 
         try {
-            BufferedImage image = ImageIO.read(new File(shotImg));
+            BufferedImage image = ImageIO.read(new File(this.shotImg));
             this.setImage(image);
         } catch (Exception e) {
             System.out.println("IMAGE READ ERROR");
@@ -50,15 +50,5 @@ public class Shot extends Sprite {
         }
 
         return false;
-    }
-
-    public Monster getHitMonster() {
-        for (Monster monster : this.board.monsters) {
-            if (Sprite.isColliding(this, monster)) {
-                return monster;
-            }
-        }
-
-        return null;
     }
 }

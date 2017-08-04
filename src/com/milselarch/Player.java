@@ -17,7 +17,10 @@ public class Player extends Sprite implements Commons {
     private final int SPEEDUP = 3;
     private final int START_Y = 580;
     private final int START_X = 470;
+    int health = PLAYER_HEALTH;
 
+    private Cooldown shotCooldown;
+    public boolean isShooting = false;
     private final String playerImg = "src/images/player.png";
     private int width;
     private int height;
@@ -28,6 +31,7 @@ public class Player extends Sprite implements Commons {
 
     private void initPlayer(Board board) {
         this.board = board;
+        this.shotCooldown = new Cooldown(PLAYER_SHOT_COOLDOWN, true);
 
         try {
             BufferedImage image = ImageIO.read(new File(playerImg));
@@ -41,6 +45,31 @@ public class Player extends Sprite implements Commons {
 
         setX(START_X);
         setY(START_Y);
+    }
+
+    public void loseHealth() {
+        if (this.health > 0) {
+            this.health--;
+        }
+    }
+
+    public void draw(Graphics2D g2d) {
+        float opacity = health / ((float) PLAYER_HEALTH);
+
+        g2d.setComposite(
+            AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity)
+        );
+
+        g2d.drawImage(
+            this.getImage(),
+            this.getX() - this.board.worldx,
+            this.getY() - this.board.worldy,
+            this.board
+        );
+
+        g2d.setComposite(
+            AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1)
+        );
     }
 
     @Override
@@ -87,6 +116,26 @@ public class Player extends Sprite implements Commons {
             this.board.worldy = -displacey;
         } else if (this.board.worldy + this.getHeight() >= WORLD_HEIGHT - displacey) {
             this.board.worldy = WORLD_HEIGHT - this.getHeight() - displacey;
+        }
+
+        if (isShooting && shotCooldown.startIfCooledDown()) {
+            Vector vec = new Vector(
+                this.board.mousex - BOARD_WIDTH/2,
+                this.board.mousey - BOARD_HEIGHT/2
+            ).getNormalised();
+
+            vec.scale(20.0);
+
+            PShot pshot = new PShot(
+                board,
+                this.board.worldx + BOARD_WIDTH/2 - this.getWidth()/2,
+                this.board.worldy + BOARD_HEIGHT/2 - this.getHeight(),
+                vec.x.intValue() + this.dx,
+                vec.y.intValue() + this.dy
+            );
+
+            this.board.pshots.add(pshot);
+            //System.out.println("XY " + shotx + ", " + shoty);
         }
     }
 
