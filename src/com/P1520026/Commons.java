@@ -18,6 +18,8 @@ public interface Commons {
 
     public static final double ENEMY_SHOT_COOLDOWN = 3;
     public static final double PLAYER_SHOT_COOLDOWN = 0.2;
+    public static final double ENEMY_SHOT_SPEED = 6;
+    public static final double PLAYER_SHOT_SPEED = 20;
 
     public static final int STUN_DURATION = 10;
     public static final int DELAY = 17;

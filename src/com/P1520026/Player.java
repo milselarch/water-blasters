@@ -132,7 +132,7 @@ public class Player extends Sprite implements Commons {
                 this.board.mousey - BOARD_HEIGHT/2
             ).getNormalised();
 
-            vec.scale(20.0);
+            vec.scale(PLAYER_SHOT_SPEED);
 
             PShot pshot = new PShot(
                 board,

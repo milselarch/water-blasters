@@ -9,13 +9,7 @@ import static com.P1520026.Commons.*;
 
 public class CleanWater extends Sprite {
     private Board board;
-    private Cooldown shotCooldown;
-
-    private Double speedup = 1.0;
-
     private final String waterImg = "src/images/water.png";
-    private boolean isChasing = false;
-    private double lastStun;
 
     public CleanWater(Board board, int x, int y) {
         initWater(board, x, y);

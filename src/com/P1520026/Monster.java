@@ -76,7 +76,7 @@ public class Monster extends Sprite implements Commons {
 
     public void fireShot(Vector direction) {
         if (!stunned() && this.shotCooldown.startIfCooledDown()) {
-            direction.scale(6.0);
+            direction.scale(ENEMY_SHOT_SPEED);
 
             EShot eshot = new EShot(
                 this.board, this.getX(), this.getY(),

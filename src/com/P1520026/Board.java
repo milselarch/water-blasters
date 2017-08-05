@@ -56,21 +56,6 @@ public class Board extends JPanel implements Runnable, Commons {
         setDoubleBuffered(true);
     }
 
-    public int getGameStatus() {
-        return this.gameStatus;
-    }
-
-    public Player getPlayer() {
-        //System.out.println(this.player);
-        return this.player;
-    }
-
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        gameInit();
-    }
-
     public void gameInit() {
         this.monsters = new ArrayList<>();
         this.cleanWaters = new ArrayList<>();
@@ -101,8 +86,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
         this.player = new Player(this);
 
-        if (animator == null
-                ) {
+        if (animator == null) {
             animator = new Thread(this);
             animator.start();
         }
@@ -112,7 +96,7 @@ public class Board extends JPanel implements Runnable, Commons {
         return cleanWaters.size();
     }
 
-    public void drawAliens(Graphics g) {
+    public void drawMonsters(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         Iterator it = monsters.iterator();
 
@@ -245,7 +229,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
             //System.out.println("WORLDX: " + this.worldx);
             //g.drawLine(0, GROUND, BOARD_WIDTH, GROUND); //draw center line
-            drawAliens(g);
+            drawMonsters(g);
             drawCleanWaters(g);
             drawShots(g);
             drawPlayer(g);
